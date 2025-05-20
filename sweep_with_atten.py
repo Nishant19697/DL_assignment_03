@@ -7,7 +7,7 @@ sweep_settings = {
     "method": "bayes",
     "project": "DL_Assig_03",
     "entity": "ee22s084-indian-institute-of-technology-madras",
-    "name": f"{target_language}-AttnSweep-01",
+    "name": f"{target_language}_with_attention",
     "metric": {
         "name": "val_accuracy",
         "goal": "maximize"
