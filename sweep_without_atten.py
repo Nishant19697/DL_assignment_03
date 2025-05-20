@@ -7,9 +7,9 @@ lang = "hindi"
 # Sweep configuration for no-attention experiments
 no_attn_sweep = {
     "method": "bayes",
-    "project": "DL_Assignm_trial_03",
+    "project": "DL_Assignm__03",
     "entity": "ee22s084-indian-institute-of-technology-madras",
-    "name": f"{lang}-NoAttnSweep-01",
+    "name": f"{lang}without_attention",
     "metric": {
         "name": "val_accuracy",
         "goal": "maximize"
