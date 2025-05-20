@@ -10,14 +10,14 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import matplotlib.pyplot as plt
 import os, random, wandb
 
-# Language directory mapping
+# Mapping between language names and ISO codes
 LANG_DIR_MAP = {
     "hindi": "hi", "bengali": "bn", "gujarati": "gu", "kannada": "kn",
     "malayalam": "ml", "marathi": "mr", "punjabi": "pa", "sindhi": "sd",
     "sinhala": "si", "tamil": "ta", "telugu": "te", "urdu": "ur"
 }
 
-
+# Configuration dataclass for setting hyperparameters and file paths
 @dataclass
 class Config:
     language: str = "hindi"
@@ -46,9 +46,11 @@ class Config:
         if self.language not in LANG_DIR_MAP:
             raise ValueError(f"Language '{self.language}' not supported.")
         lang_code = LANG_DIR_MAP[self.language]
+        # Construct dataset paths
         self.train_path = os.path.join(self.data_root, f"{lang_code}/lexicons/{lang_code}.translit.sampled.train.tsv")
         self.dev_path = os.path.join(self.data_root, f"{lang_code}/lexicons/{lang_code}.translit.sampled.dev.tsv")
         self.test_path = os.path.join(self.data_root, f"{lang_code}/lexicons/{lang_code}.translit.sampled.test.tsv")
+        # Check for file existence
         for path in [self.train_path, self.dev_path, self.test_path]:
             if not os.path.exists(path):
                 raise FileNotFoundError(f"Missing dataset file: {path}")
@@ -59,17 +61,23 @@ class TransliterationTrainer:
         prepare_vocabularies(cfg.train_path, cfg.dev_path)
         self.cfg = cfg
 
+        # Load datasets
         train_data = TransliterationDataset(cfg.train_path)
         val_data = TransliterationDataset(cfg.dev_path)
         test_data = TransliterationDataset(cfg.test_path)
 
-        self.train_loader = DataLoader(train_data, batch_size=cfg.batch_sz, shuffle=True, collate_fn=batch_collator,
-                                       num_workers=cfg.n_workers, pin_memory=True, persistent_workers=True)
-        self.val_loader = DataLoader(val_data, batch_size=cfg.batch_sz, shuffle=False, collate_fn=batch_collator,
-                                     num_workers=cfg.n_workers, pin_memory=True, persistent_workers=True)
-        self.test_loader = DataLoader(test_data, batch_size=cfg.batch_sz, shuffle=False, collate_fn=batch_collator,
-                                      num_workers=cfg.n_workers, pin_memory=True, persistent_workers=True)
+        # DataLoaders
+        self.train_loader = DataLoader(train_data, batch_size=cfg.batch_sz, shuffle=True,
+                                       collate_fn=batch_collator, num_workers=cfg.n_workers,
+                                       pin_memory=True, persistent_workers=True)
+        self.val_loader = DataLoader(val_data, batch_size=cfg.batch_sz, shuffle=False,
+                                     collate_fn=batch_collator, num_workers=cfg.n_workers,
+                                     pin_memory=True, persistent_workers=True)
+        self.test_loader = DataLoader(test_data, batch_size=cfg.batch_sz, shuffle=False,
+                                      collate_fn=batch_collator, num_workers=cfg.n_workers,
+                                      pin_memory=True, persistent_workers=True)
 
+        # Model configuration
         model_cfg = ModelParams(
             decoder_SOS=train_data.target.SOS,
             source_vocab_size=train_data.source.vocab_size,
@@ -102,8 +110,10 @@ class TransliterationTrainer:
             val_loss, val_acc = self._validate_epoch(ep)
             print(f"Epoch {ep+1}: Train Loss={train_loss:.4f} Acc={train_acc:.4f} | Val Loss={val_loss:.4f} Acc={val_acc:.4f}")
             if self.cfg.enable_wandb:
-                wandb.log({"train_loss": train_loss, "train_accuracy": train_acc,
-                           "val_loss": val_loss, "val_accuracy": val_acc})
+                wandb.log({
+                    "train_loss": train_loss, "train_accuracy": train_acc,
+                    "val_loss": val_loss, "val_accuracy": val_acc
+                })
 
     def _train_epoch(self, epoch):
         self.model.train()
@@ -155,6 +165,7 @@ class TransliterationTrainer:
     def _calc_bleu(self, refs, hyps, testset):
         score, ref_list, hyp_list = 0, [], []
         for ref, hyp in zip(refs, hyps):
+            # Trim at EOS
             r_trim = ref[:(ref == testset.target.EOS).nonzero(as_tuple=True)[0].item()] if (ref == testset.target.EOS).any() else ref
             h_trim = hyp[:(hyp == testset.target.EOS).nonzero(as_tuple=True)[0].item()] if (hyp == testset.target.EOS).any() else hyp
             r_txt = testset.target.itos(r_trim)
@@ -176,7 +187,7 @@ class TransliterationTrainer:
             pred_word = self.train_loader.dataset.target.itos(final_seq)
             print(f"Prediction: {pred_word}")
             if show_attn:
-                self._plot_attention(attn.squeeze(1, 2)[:, :-1])
+                self._plot_attention(attn.squeeze(1, 2)[:, :-1])  # Show attention up to the predicted tokens
 
     def _plot_attention(self, attn_tensor, save_path="attention_map.png"):
         plt.figure(figsize=(10, 6))
@@ -186,4 +197,4 @@ class TransliterationTrainer:
         plt.xlabel("Encoder Time Steps")
         plt.ylabel("Decoder Time Steps")
         plt.tight_layout()
-        plt.savefig(save_path)
+        plt.savefig(save_path)  
