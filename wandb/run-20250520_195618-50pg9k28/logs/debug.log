@@ -1,0 +1,35 @@
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_setup.py:_flush():67] Current SDK version is 0.19.8
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_setup.py:_flush():67] Configure stats pid to 69209
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_setup.py:_flush():67] Loading settings from /speech/nishanth/.config/wandb/settings
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_setup.py:_flush():67] Loading settings from /speech/nishanth/dl_assig/DL_trial/wandb/settings
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_setup.py:_flush():67] Loading settings from environment variables
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_init.py:setup_run_log_directory():647] Logging user logs to /speech/nishanth/dl_assig/DL_trial/wandb/run-20250520_195618-50pg9k28/logs/debug.log
+2025-05-20 19:56:18,951 INFO    Thread-6  :69209 [wandb_init.py:setup_run_log_directory():648] Logging internal logs to /speech/nishanth/dl_assig/DL_trial/wandb/run-20250520_195618-50pg9k28/logs/debug-internal.log
+2025-05-20 19:56:18,952 INFO    Thread-6  :69209 [wandb_init.py:init():761] calling init triggers
+2025-05-20 19:56:18,952 INFO    Thread-6  :69209 [wandb_init.py:init():766] wandb.init called with sweep_config: {'apply_attention': False, 'beam_size': 1, 'decoder_name': 'RNN', 'decoder_num_layers': 2, 'dropout_p': 0.2, 'embedding_size': 128, 'encoder_bidirectional': True, 'encoder_name': 'GRU', 'encoder_num_layers': 3, 'hidden_size': 256, 'learning_rate': 0.001, 'teacher_forcing_p': 0.5}
+config: {'_wandb': {}}
+2025-05-20 19:56:18,952 INFO    Thread-6  :69209 [wandb_init.py:init():784] starting backend
+2025-05-20 19:56:18,952 INFO    Thread-6  :69209 [wandb_init.py:init():788] sending inform_init request
+2025-05-20 19:56:18,953 INFO    Thread-6  :69209 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-05-20 19:56:18,953 INFO    Thread-6  :69209 [wandb_init.py:init():798] backend started and connected
+2025-05-20 19:56:18,955 INFO    Thread-6  :69209 [wandb_run.py:_config_callback():1261] config_cb None None {'apply_attention': False, 'beam_size': 1, 'decoder_name': 'RNN', 'decoder_num_layers': 2, 'dropout_p': 0.2, 'embedding_size': 128, 'encoder_bidirectional': True, 'encoder_name': 'GRU', 'encoder_num_layers': 3, 'hidden_size': 256, 'learning_rate': 0.001, 'teacher_forcing_p': 0.5}
+2025-05-20 19:56:18,957 INFO    Thread-6  :69209 [wandb_init.py:init():891] updated telemetry
+2025-05-20 19:56:18,987 INFO    Thread-6  :69209 [wandb_init.py:init():915] communicating run to backend with 90.0 second timeout
+2025-05-20 19:56:19,289 INFO    MsgRouterThr:69209 [mailbox.py:close():129] Closing mailbox, abandoning 1 handles.
+2025-05-20 19:56:19,290 ERROR   Thread-6  :69209 [wandb_init.py:init():1478] error in wandb.init()
+Traceback (most recent call last):
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 1468, in init
+    return wi.init(run_settings, run_config)
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/wandb_init.py", line 941, in init
+    result = wait_with_progress(
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 24, in wait_with_progress
+    return wait_all_with_progress(
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 70, in wait_all_with_progress
+    return _wait_handles(handle_list, timeout=progress_after)
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 110, in _wait_handles
+    results.append(handle.wait_or(timeout=remaining_timeout))
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/mailbox/mailbox_handle.py", line 122, in wait_or
+    return self._fn(self._handle.wait_or(timeout=timeout))
+  File "/speech/nishanth/anaconda3/envs/gd_exps/lib/python3.9/site-packages/wandb/sdk/mailbox/response_handle.py", line 98, in wait_or
+    raise HandleAbandonedError()
+wandb.sdk.mailbox.mailbox_handle.HandleAbandonedError

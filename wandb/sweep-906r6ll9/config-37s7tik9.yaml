@@ -1,0 +1,26 @@
+wandb_version: 1
+
+apply_attention:
+  value: false
+beam_size:
+  value: 1
+decoder_name:
+  value: RNN
+decoder_num_layers:
+  value: 1
+dropout_p:
+  value: 0.3
+embedding_size:
+  value: 128
+encoder_bidirectional:
+  value: true
+encoder_name:
+  value: GRU
+encoder_num_layers:
+  value: 2
+hidden_size:
+  value: 256
+learning_rate:
+  value: 0.001
+teacher_forcing_p:
+  value: 0.8
