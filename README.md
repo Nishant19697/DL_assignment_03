@@ -74,3 +74,14 @@ dropout_p: 0.3
 teacher_forcing_p: 0.5
 beam_size: 1
 apply_attention: True
+
+
+
+├── data/                     # Preprocessed Dakshina dataset
+├── models/                   # Model definitions (Vanilla, Attention)
+├── trainer.py                # Training loop and evaluation logic
+├── sweeps/                   # W&B sweep config files
+├── predictions_vanilla/      # Outputs from best vanilla model
+├── predictions_attention/    # Outputs from attention-based model
+└── README.md                 # This file
+
