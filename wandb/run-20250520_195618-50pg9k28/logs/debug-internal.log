@@ -1,8 +1,0 @@
-{"time":"2025-05-20T19:56:18.956955648+05:30","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/speech/nishanth/dl_assig/DL_trial/wandb/run-20250520_195618-50pg9k28/logs/debug-core.log"}
-{"time":"2025-05-20T19:56:19.070810139+05:30","level":"INFO","msg":"created new stream","id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.070851349+05:30","level":"INFO","msg":"stream: started","id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.071975656+05:30","level":"INFO","msg":"writer: Do: started","stream_id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.072759133+05:30","level":"INFO","msg":"handler: started","stream_id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.072808343+05:30","level":"INFO","msg":"sender: started","stream_id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.290986147+05:30","level":"INFO","msg":"stream: closing","id":"50pg9k28"}
-{"time":"2025-05-20T19:56:19.54420162+05:30","level":"ERROR","msg":"sender: upsertConfig: RunRecord is nil"}
