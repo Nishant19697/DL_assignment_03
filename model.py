@@ -5,6 +5,7 @@ from utils import prepare_vocabularies, TransliterationDataset, batch_collator
 from dataclasses import dataclass
 from collections import namedtuple
 
+# Configuration class to define all model hyperparameters
 @dataclass
 class ModelParams:
     src_vocab: int = 500
@@ -27,7 +28,7 @@ class ModelParams:
         assert self.enc_type in ["RNN", "GRU", "LSTM"]
         assert self.dec_type in ["RNN", "GRU", "LSTM"]
 
-
+# Encoder module: embeds input tokens and passes them through an RNN
 class SeqEncoder(nn.Module):
     def __init__(self, cfg: ModelParams):
         super().__init__()
@@ -48,10 +49,10 @@ class SeqEncoder(nn.Module):
         enc_output, enc_hidden = self.rnn(x)
         enc_output = self.final_drop(enc_output)
         if isinstance(enc_hidden, tuple):
-            enc_hidden = enc_hidden[0]
+            enc_hidden = enc_hidden[0]  # For LSTM: use only hidden state
         return enc_output, enc_hidden
 
-
+# Simple decoder without attention
 class SimpleDecoder(nn.Module):
     def __init__(self, cfg: ModelParams):
         super().__init__()
@@ -74,11 +75,12 @@ class SimpleDecoder(nn.Module):
         maxlen = target.shape[1] if target is not None else self.cfg.max_seq_len
         teacher_forcing = torch.rand(1) < tf_ratio
         if not teacher_forcing:
-            target = None
+            target = None  # Use model predictions if no teacher forcing
 
         input_tok = torch.full((enc_output.shape[0], 1), fill_value=self.cfg.start_tok,
                                dtype=torch.long, device=enc_output.device)
         preds = []
+
         for step in range(maxlen):
             step_out, hidden = self.decode_step(input_tok, hidden)
             preds.append(step_out)
@@ -101,7 +103,7 @@ class SimpleDecoder(nn.Module):
             hidden = hidden[0]
         return out, hidden
 
-
+# Additive attention mechanism (Bahdanau-style)
 class AdditiveAttention(nn.Module):
     def __init__(self, cfg: ModelParams):
         super().__init__()
@@ -113,14 +115,14 @@ class AdditiveAttention(nn.Module):
 
     def forward(self, enc_states, dec_hidden):
         B, T, H = enc_states.shape
-        dec_last = dec_hidden[-1]
+        dec_last = dec_hidden[-1]  # Use the last layer of decoder hidden state
         energy = self.tanh(self.linear_e(enc_states) + self.linear_d(dec_last).unsqueeze(1))
         scores = self.v(energy).squeeze(-1)
         attn_weights = F.softmax(scores, dim=-1)
         context = torch.bmm(attn_weights.unsqueeze(1), enc_states)
         return context, attn_weights
 
-
+# Decoder with attention
 class AttnDecoder(nn.Module):
     def __init__(self, cfg: ModelParams):
         super().__init__()
@@ -154,15 +156,15 @@ class AttnDecoder(nn.Module):
         attn_seq = []
 
         if torch.rand(1) > tf_ratio:
-            target = None
+            target = None  # No teacher forcing
 
-        for _ in range(T):
+        for t in range(T):
             logits, hidden, attn = self.step(input_tok, hidden, enc_states)
             pred_seq.append(logits)
             if return_attn:
                 attn_seq.append(attn)
             if target is not None:
-                input_tok = target[:, _].unsqueeze(1)
+                input_tok = target[:, t].unsqueeze(1)
             else:
                 input_tok = torch.argmax(F.log_softmax(logits, dim=-1), dim=-1)
 
@@ -184,7 +186,7 @@ class AttnDecoder(nn.Module):
         # Placeholder for beam search if needed later
         pass
 
-
+# Full Seq2Seq model combining encoder and decoder
 class Seq2SeqModel(nn.Module):
     def __init__(self, cfg: ModelParams):
         super().__init__()
@@ -195,6 +197,8 @@ class Seq2SeqModel(nn.Module):
 
     def forward(self, src, tgt=None, tf_ratio=1.0, beam=1, return_attn=False):
         enc_out, enc_hid = self.encoder(src)
+        
+        # Adjust encoder hidden size for decoder
         expected_layers = self.cfg.dec_layers * (2 if self.cfg.bidir_dec else 1)
         if expected_layers > enc_hid.size(0):
             padding = enc_hid[:expected_layers - enc_hid.size(0)]
@@ -204,6 +208,7 @@ class Seq2SeqModel(nn.Module):
 
         if return_attn:
             assert src.size(0) == 1, "Attention maps supported for batch size 1 only"
+
         preds, attn = self.decoder(enc_out, enc_hid, tgt, tf_ratio, beam, return_attn)
 
         loss, acc = None, None
